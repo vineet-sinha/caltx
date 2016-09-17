@@ -1,8 +1,25 @@
 #!/usr/bin/env node
 var program = require('commander');
+var request = require('request');
+var cheerio = require('cheerio');
 
 function finder(url) {
-  console.log(url);
+  request(url, function(error, response, html) {
+    if (error) {
+      console.log(error, error.stack);
+      return;
+    }
+    var $ = cheerio.load(html);
+    $('td.ZhCalDaySEP').filter(function() {
+      var data = $(this);
+      var title = data.children().first().text();
+      title = title.replace(/\r?\n|\r/g, ' ');
+      title = title.replace(/\s+/g, ' ');
+      if (title == '') return;
+      if (title == ' ') return;
+      console.log('x', title, 'x');
+    });
+  });
 }
 
 program
