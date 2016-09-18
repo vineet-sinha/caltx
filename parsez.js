@@ -40,22 +40,22 @@ function hrInMin(hr) {
   return hr*60;
 }
 function tzCorr() {
-  // return hrInMin(-3);
-  return 0;
+  return hrInMin(3);
+  // return 0;
 }
 function timeInMin(hr, min) {
   return hrInMin(parseInt(hr)) + parseInt(min);
 }
-function minToTime(totalMin, showAMPM) {
+function minToTime(totalMin, dontShowAMPM) {
   var hr = Math.trunc(totalMin / 60);
   var ampm = ' am';
-  if (showAMPM && hr > 12) {
+  if (!dontShowAMPM && hr > 12) {
     ampm = ' pm';
     hr -= 12;
   }
   var min = totalMin % 60;
   if (min == 0) min = '00'
-  return '' + hr + ':' + min + (showAMPM?ampm:'');
+  return '' + hr + ':' + min + (dontShowAMPM?'':ampm);
 }
 function findObstacles(entries, entry) {
   var obstableCnt = 0;
@@ -105,17 +105,23 @@ var calModel = {
       duration: getDuration(tableParent.attr('rowspan')),
       tablePos: correctPosToCalendar(start, getPos(tableParent))
     };
-    entry.startTime = minToTime(entry.start, true);
-    entry.durationTime = minToTime(entry.duration);
-    entry.dateNdx = this.findEntryDate(entry);
+    entry.startTime = minToTime(entry.start);
+    entry.durationTime = minToTime(entry.duration, true);
+    entry.date = this.findEntryDate(entry);
     this.entries.push(entry);
 
     // console.log(entry);
   },
   logEntries: function() {
+    var outCal = {};
+    this.days.forEach(function(day) { outCal[day] = []});
     this.entries.forEach(function(item) {
-      console.log(item);
+      // console.log(item);
+      // console.log(item.dateNdx + ': ' + item.startTime + '-' + minToTime(item.start+item.duration));
+      outCal[item.date].push(item.startTime + '-' + minToTime(item.start+item.duration));
     });
+    console.log('busy times');
+    console.log(outCal);
   }
 };
 
