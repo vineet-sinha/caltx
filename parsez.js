@@ -3,7 +3,7 @@ var program = require('commander');
 var request = require('request');
 var cheerio = require('cheerio');
 
-// utils
+// general utils
 function strip(str) {
   return str.replace(/\s+/g, ' ');      // strip spaces
 }
@@ -11,6 +11,25 @@ function logEl(el) {
   console.log(el['0'].name, ': ', strip(el.html()));
 }
 
+// data extraction methods
+function getDuration(rs) {
+  if (rs == undefined) {
+    return '0:15';
+  }
+  var totalMin = parseInt(rs) * 15;
+  var hr = Math.trunc(totalMin / 60);
+  var min = totalMin % 60;
+  if (min == 0) min = '00'
+  return '' + hr + ':' + min;
+};
+function getPos(el) {
+  if (!el['0']) return 0;
+  // if (el.prev() == null) return 0;
+  // if (el.prev().html() == null) return 0;
+  return 1 + getPos(el.prev());
+};
+
+// the actual model
 var calModel = {
   days: [],
   logDays: function() {
@@ -22,9 +41,13 @@ var calModel = {
     calModel.days[dayOfWeekNdx] = strip(dayOfWeekStr);
   },
 
+
   entries: [],
 
-  addEntry: function(start, duration, tablePos) {
+  addEntry: function(highlightCell, tableParent) {
+    var start = strip(highlightCell.text()).replace(/([AP]M).*/, '$1');
+    var duration = getDuration(tableParent.attr('rowspan'));
+    var tablePos = getPos(tableParent);
     this.entries.push({start: start, duration: duration, tablePos: tablePos});
   },
   logEntries: function() {
@@ -50,10 +73,6 @@ function finder(url) {
     // var data = $('td.OrangeLight').last();
     $('td.OrangeLight').each(function(ndx, data) {
 
-      var start = strip($(data).text());
-      start = start.replace(/([AP]M).*/, '$1');
-
-
       /*
       selection is busy start time
       first parent is the row
@@ -61,30 +80,15 @@ function finder(url) {
       third parent is table
       fourth parent is containing cell (rowspan tells duration)
       */
-      var getDuration = function(rs) {
-        if (rs == undefined) {
-          return '0:15';
-        }
-        var totalMin = parseInt(rs) * 15;
-        var hr = Math.trunc(totalMin / 60);
-        var min = totalMin % 60;
-        if (min == 0) min = '00'
-        return '' + hr + ':' + min;
-      };
-      var getPos = function(el) {
-        if (!el['0']) return 0;
-        // if (el.prev() == null) return 0;
-        // if (el.prev().html() == null) return 0;
-        return 1 + getPos(el.prev());
-      };
+
+      var highlightCell = $(data);
 
       // var end = $(data).parent().siblings().last().text();
       // end = strip(end);
 
       var table = $(data).parent().parent().parent();
-      var duration = getDuration(table.attr('rowspan'));
 
-      calModel.addEntry(start, duration, getPos(table));
+      calModel.addEntry(highlightCell, table);
     });
     calModel.logEntries();
   });
