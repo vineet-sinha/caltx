@@ -12,23 +12,23 @@ function logEl(el) {
 }
 
 var calModel = {
-  day: [],
+  days: [],
   logDays: function() {
-    this.day.forEach(function(item, ndx) {
+    this.days.forEach(function(item, ndx) {
       console.log(ndx + ': ' + item);
     })
   },
   addDay: function(dayOfWeekNdx, dayOfWeekStr) {
-    calModel.day[dayOfWeekNdx] = strip(dayOfWeekStr);
+    calModel.days[dayOfWeekNdx] = strip(dayOfWeekStr);
   },
 
-  entry: [],
+  entries: [],
 
   addEntry: function(start, duration, tablePos) {
-    this.entry.push({start: start, duration: duration, tablePos: tablePos});
+    this.entries.push({start: start, duration: duration, tablePos: tablePos});
   },
   logEntries: function() {
-    this.entry.forEach(function(item) {
+    this.entries.forEach(function(item) {
       console.log('start:', item.start, ', duration:', item.duration, 'x', item.tablePos);
     });
   }
