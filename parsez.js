@@ -35,12 +35,22 @@ function finder(url) {
       third parent is table
       fourth parent is containing cell (rowspan tells duration)
       */
+      var getDuration = function(rs) {
+        if (rs == undefined) {
+          return '0:15';
+        }
+        var totalMin = parseInt(rs) * 15;
+        var hr = Math.trunc(totalMin / 60);
+        var min = totalMin % 60;
+        if (min == 0) min = '00'
+        return '' + hr + ':' + min;
+      }
 
       var end = $(data).parent().siblings().last().text();
       end = strip(end);
 
       var table = $(data).parent().parent().parent();
-      var duration = table.attr('rowspan');
+      var duration = getDuration(table.attr('rowspan'));
 
       console.log('x', title, 'x', end, 'x', duration, 'x');
     });
