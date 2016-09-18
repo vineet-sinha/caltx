@@ -20,6 +20,17 @@ var calModel = {
   },
   addDay: function(dayOfWeekNdx, dayOfWeekStr) {
     calModel.day[dayOfWeekNdx] = strip(dayOfWeekStr);
+  },
+
+  entry: [],
+
+  addEntry: function(start, duration, tablePos) {
+    this.entry.push({start: start, duration: duration, tablePos: tablePos});
+  },
+  logEntries: function() {
+    this.entry.forEach(function(item) {
+      console.log('start:', item.start, ', duration:', item.duration, 'x', item.tablePos);
+    });
   }
 };
 
@@ -73,8 +84,9 @@ function finder(url) {
       var table = $(data).parent().parent().parent();
       var duration = getDuration(table.attr('rowspan'));
 
-      console.log('start:', start, ', duration:', duration, 'x', getPos(table));
+      calModel.addEntry(start, duration, getPos(table));
     });
+    calModel.logEntries();
   });
 }
 
