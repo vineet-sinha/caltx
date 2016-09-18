@@ -11,6 +11,18 @@ function logEl(el) {
   console.log(el['0'].name, ': ', strip(el.html()));
 }
 
+var calModel = {
+  day: [],
+  logDays: function() {
+    this.day.forEach(function(item, ndx) {
+      console.log(ndx + ': ' + item);
+    })
+  },
+  addDay: function(dayOfWeekNdx, dayOfWeekStr) {
+    calModel.day[dayOfWeekNdx] = strip(dayOfWeekStr);
+  }
+};
+
 
 function finder(url) {
   request(url, function(error, response, html) {
@@ -19,13 +31,10 @@ function finder(url) {
       return;
     }
     var $ = cheerio.load(html, {xmlMode: true});
-    var weekModel = {
-      day: []
-    };
     $('.ZhCalDaySEP.ZhCalDayHeader, .ZhCalDaySEP.ZhCalDayHeaderToday').each(function(ndx, data) {
-      console.log(ndx + ': ' + strip($(data).text()));
-      weekModel.day[ndx] = $(data).text();
+      calModel.addDay(ndx, $(data).text());
     });
+    calModel.logDays();
 
     // var data = $('td.OrangeLight').last();
     $('td.OrangeLight').each(function(ndx, data) {
