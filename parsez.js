@@ -24,6 +24,18 @@ function getPos(el) {
   // if (el.prev().html() == null) return 0;
   return 1 + getPos(el.prev());
 };
+function correctPosToCalendar(start, tablePos) {
+  // remove the hour positioning
+  if (start % 60 == 0) tablePos--;
+
+  // remove the gap between the hour column and the calendar column
+  tablePos--;
+
+  // switch from 1-base to 0-base
+  tablePos--;
+
+  return tablePos;
+}
 function hrInMin(hr) {
   return hr*60;
 }
@@ -45,6 +57,22 @@ function minToTime(totalMin, showAMPM) {
   if (min == 0) min = '00'
   return '' + hr + ':' + min + (showAMPM?ampm:'');
 }
+function findObstacles(entries, entry) {
+  if (entry.startTime == '10:45 am') {
+    console.log('found it');
+    // debugger;
+  }
+  var obstableCnt = 0;
+  entries.forEach(function(currEntry) {
+    if (entry.tablePos<currEntry.tablePos) return; // we don't care about obstacles in the futre
+    if (entry.start > currEntry.start && entry.start < (currEntry.start + currEntry.duration)) {
+      console.log('found obstacle -- for:' + entry.startTime + ' with: ' + currEntry.startTime);
+      obstableCnt ++;
+    }
+  });
+  return obstableCnt;
+}
+
 
 // the actual model
 var calModel = {
@@ -64,21 +92,8 @@ var calModel = {
   findEntryDate: function(entry) {
     var pos = entry.tablePos;
 
-    // remove the hour positioning
-    if (entry.start % 60 == 0) pos--;
-
-    // remove the gap between the hour column and the calendar column
-    pos--;
-
-    // switch from 1-base to 0-base
-    pos--;
-
-    // todo: increment for obstacle avoidance!!
-
-    // for prettier printing
-    delete entry.start;
-    delete entry.duration;
-    delete entry.tablePos;
+    // html table cells skip columns where there are obstables
+    pos += findObstacles(this.entries, entry);
 
     return this.days[pos];
   },
@@ -91,10 +106,10 @@ var calModel = {
 
     var entry = {
       start: start, 
-      duration: getDuration(tableParent.attr('rowspan')), 
-      tablePos: getPos(tableParent)
+      duration: getDuration(tableParent.attr('rowspan')),
+      tablePos: correctPosToCalendar(start, getPos(tableParent))
     };
-    entry.startTime = minToTime(entry.start, true), 
+    entry.startTime = minToTime(entry.start, true);
     entry.durationTime = minToTime(entry.duration);
     entry.dateNdx = this.findEntryDate(entry);
     this.entries.push(entry);
