@@ -58,15 +58,11 @@ function minToTime(totalMin, showAMPM) {
   return '' + hr + ':' + min + (showAMPM?ampm:'');
 }
 function findObstacles(entries, entry) {
-  if (entry.startTime == '10:45 am') {
-    console.log('found it');
-    // debugger;
-  }
   var obstableCnt = 0;
   entries.forEach(function(currEntry) {
     if (entry.tablePos<currEntry.tablePos) return; // we don't care about obstacles in the futre
     if (entry.start > currEntry.start && entry.start < (currEntry.start + currEntry.duration)) {
-      console.log('found obstacle -- for:' + entry.startTime + ' with: ' + currEntry.startTime);
+      // console.log('found obstacle -- for:' + entry.startTime + ' with: ' + currEntry.startTime);
       obstableCnt ++;
     }
   });
@@ -100,7 +96,7 @@ var calModel = {
   addEntry: function(highlightCell, tableParent) {
     var start = tzCorr();
     var startStr = highlightCell.text();
-    if (startStr.indexOf('PM') !== -1) start += hrInMin(12);
+    if (startStr.indexOf('PM') !== -1 && !startStr.includes('12:')) start += hrInMin(12);
     startStr = startStr.replace(/ [AP]M.*/, '');
     start += timeInMin(startStr.replace(/:.*/, ''), startStr.replace(/.*:/, ''));
 
@@ -113,6 +109,8 @@ var calModel = {
     entry.durationTime = minToTime(entry.duration);
     entry.dateNdx = this.findEntryDate(entry);
     this.entries.push(entry);
+
+    // console.log(entry);
   },
   logEntries: function() {
     this.entries.forEach(function(item) {
