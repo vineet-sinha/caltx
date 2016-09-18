@@ -14,13 +14,10 @@ function logEl(el) {
 // data extraction methods
 function getDuration(rs) {
   if (rs == undefined) {
-    return '0:15';
+    return minToTime(15);
   }
   var totalMin = parseInt(rs) * 15;
-  var hr = Math.trunc(totalMin / 60);
-  var min = totalMin % 60;
-  if (min == 0) min = '00'
-  return '' + hr + ':' + min;
+  return minToTime(totalMin);
 };
 function getPos(el) {
   if (!el['0']) return 0;
@@ -28,6 +25,27 @@ function getPos(el) {
   // if (el.prev().html() == null) return 0;
   return 1 + getPos(el.prev());
 };
+function hrInMin(hr) {
+  return hr*60;
+}
+function tzCorr() {
+  // return hrInMin(-3);
+  return 0;
+}
+function timeInMin(hr, min) {
+  return hrInMin(parseInt(hr)) + parseInt(min);
+}
+function minToTime(totalMin, showAMPM) {
+  var hr = Math.trunc(totalMin / 60);
+  var ampm = ' am';
+  if (showAMPM && hr > 12) {
+    ampm = ' pm';
+    hr -= 12;
+  }
+  var min = totalMin % 60;
+  if (min == 0) min = '00'
+  return '' + hr + ':' + min + (showAMPM?ampm:'');
+}
 
 // the actual model
 var calModel = {
@@ -45,14 +63,19 @@ var calModel = {
   entries: [],
 
   addEntry: function(highlightCell, tableParent) {
-    var start = strip(highlightCell.text()).replace(/([AP]M).*/, '$1');
+    var start = tzCorr();
+    var startStr = highlightCell.text();
+    if (startStr.indexOf('PM') !== -1) start += hrInMin(12);
+    startStr = startStr.replace(/ [AP]M.*/, '');
+    start += timeInMin(startStr.replace(/:.*/, ''), startStr.replace(/.*:/, ''));
+
     var duration = getDuration(tableParent.attr('rowspan'));
     var tablePos = getPos(tableParent);
     this.entries.push({start: start, duration: duration, tablePos: tablePos});
   },
   logEntries: function() {
     this.entries.forEach(function(item) {
-      console.log('start:', item.start, ', duration:', item.duration, 'x', item.tablePos);
+      console.log('start:', minToTime(item.start, true), ', duration:', item.duration, 'x', item.tablePos);
     });
   }
 };
