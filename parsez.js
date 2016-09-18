@@ -19,6 +19,10 @@ function finder(url) {
       return;
     }
     var $ = cheerio.load(html, {xmlMode: true});
+    $('.ZhCalDaySEP.ZhCalDayHeader').each(function(ndx, data) {
+      console.log(ndx + ': ' + strip($(data).text()));
+    });
+
     // var data = $('td.OrangeLight').last();
     $('td.OrangeLight').each(function(ndx, data) {
 
@@ -42,7 +46,13 @@ function finder(url) {
         var min = totalMin % 60;
         if (min == 0) min = '00'
         return '' + hr + ':' + min;
-      }
+      };
+      var getPos = function(el) {
+        if (!el['0']) return 0;
+        // if (el.prev() == null) return 0;
+        // if (el.prev().html() == null) return 0;
+        return 1 + getPos(el.prev());
+      };
 
       // var end = $(data).parent().siblings().last().text();
       // end = strip(end);
@@ -50,7 +60,7 @@ function finder(url) {
       var table = $(data).parent().parent().parent();
       var duration = getDuration(table.attr('rowspan'));
 
-      console.log('x', start, 'x', duration, 'x');
+      console.log('start:', start, ', duration:', duration, 'x', getPos(table));
     });
   });
 }
