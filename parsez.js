@@ -5,7 +5,7 @@ var cheerio = require('cheerio');
 
 // general utils
 function strip(str) {
-  return str.replace(/\s+/g, ' ');      // strip spaces
+  return str.replace(/\s+/g, ' ').trim();      // strip spaces
 }
 function logEl(el) {
   console.log(el['0'].name, ': ', strip(el.html()));
