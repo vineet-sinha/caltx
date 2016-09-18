@@ -21,11 +21,9 @@ function finder(url) {
     var $ = cheerio.load(html, {xmlMode: true});
     // var data = $('td.OrangeLight').last();
     $('td.OrangeLight').each(function(ndx, data) {
-      // var title = $(data).children().first().text();
-      var title = strip($(data).text());
-      // title = title.replace(/\r?\n|\r/g, ' '); // strip new lines
-      if (title == '') return;
-      if (title == ' ') return;
+
+      var start = strip($(data).text());
+      start = start.replace(/([AP]M).*/, '$1');
 
 
       /*
@@ -46,13 +44,13 @@ function finder(url) {
         return '' + hr + ':' + min;
       }
 
-      var end = $(data).parent().siblings().last().text();
-      end = strip(end);
+      // var end = $(data).parent().siblings().last().text();
+      // end = strip(end);
 
       var table = $(data).parent().parent().parent();
       var duration = getDuration(table.attr('rowspan'));
 
-      console.log('x', title, 'x', end, 'x', duration, 'x');
+      console.log('x', start, 'x', duration, 'x');
     });
   });
 }
