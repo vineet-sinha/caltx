@@ -22,7 +22,7 @@ function finder(url) {
     var weekModel = {
       day: []
     };
-    $('.ZhCalDaySEP.ZhCalDayHeader').each(function(ndx, data) {
+    $('.ZhCalDaySEP.ZhCalDayHeader, .ZhCalDaySEP.ZhCalDayHeaderToday').each(function(ndx, data) {
       console.log(ndx + ': ' + strip($(data).text()));
       weekModel.day[ndx] = $(data).text();
     });
