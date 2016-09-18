@@ -19,8 +19,12 @@ function finder(url) {
       return;
     }
     var $ = cheerio.load(html, {xmlMode: true});
+    var weekModel = {
+      day: []
+    };
     $('.ZhCalDaySEP.ZhCalDayHeader').each(function(ndx, data) {
       console.log(ndx + ': ' + strip($(data).text()));
+      weekModel.day[ndx] = $(data).text();
     });
 
     // var data = $('td.OrangeLight').last();
