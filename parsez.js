@@ -113,15 +113,23 @@ var calModel = {
     // console.log(entry);
   },
   logEntries: function() {
-    var outCal = {};
-    this.days.forEach(function(day) { outCal[day] = []});
+    var outCal = {
+      busy: {},
+      entries: {}
+    };
+    this.days.forEach(function(day) {
+      outCal.busy[day] = [];
+      outCal.entries[day] = [];
+    });
     this.entries.forEach(function(item) {
       // console.log(item);
       // console.log(item.dateNdx + ': ' + item.startTime + '-' + minToTime(item.start+item.duration));
-      outCal[item.date].push(item.startTime + '-' + minToTime(item.start+item.duration));
+      outCal.busy[item.date].push(item.startTime + '-' + minToTime(item.start+item.duration));
+      outCal.entries[item.date].push(item);
     });
-    console.log('busy times');
-    console.log(outCal);
+    console.log('Busy times');
+    console.log(outCal.busy);
+    // console.log('Free times'); // TODO
   }
 };
 
@@ -136,7 +144,7 @@ function finder(url) {
     $('.ZhCalDaySEP.ZhCalDayHeader, .ZhCalDaySEP.ZhCalDayHeaderToday').each(function(ndx, data) {
       calModel.addDay(ndx, $(data).text());
     });
-    calModel.logDays();
+    // calModel.logDays();
 
     // var data = $('td.OrangeLight').last();
     $('td.OrangeLight').each(function(ndx, data) {
