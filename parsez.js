@@ -14,10 +14,9 @@ function logEl(el) {
 // data extraction methods
 function getDuration(rs) {
   if (rs == undefined) {
-    return minToTime(15);
+    return 15;
   }
-  var totalMin = parseInt(rs) * 15;
-  return minToTime(totalMin);
+  return parseInt(rs) * 15;
 };
 function getPos(el) {
   if (!el['0']) return 0;
@@ -62,6 +61,27 @@ var calModel = {
 
   entries: [],
 
+  findEntryDate: function(entry) {
+    var pos = entry.tablePos;
+
+    // remove the hour positioning
+    if (entry.start % 60 == 0) pos--;
+
+    // remove the gap between the hour column and the calendar column
+    pos--;
+
+    // switch from 1-base to 0-base
+    pos--;
+
+    // todo: increment for obstacle avoidance!!
+
+    // for prettier printing
+    delete entry.start;
+    delete entry.duration;
+    delete entry.tablePos;
+
+    return this.days[pos];
+  },
   addEntry: function(highlightCell, tableParent) {
     var start = tzCorr();
     var startStr = highlightCell.text();
@@ -69,13 +89,19 @@ var calModel = {
     startStr = startStr.replace(/ [AP]M.*/, '');
     start += timeInMin(startStr.replace(/:.*/, ''), startStr.replace(/.*:/, ''));
 
-    var duration = getDuration(tableParent.attr('rowspan'));
-    var tablePos = getPos(tableParent);
-    this.entries.push({start: start, duration: duration, tablePos: tablePos});
+    var entry = {
+      start: start, 
+      duration: getDuration(tableParent.attr('rowspan')), 
+      tablePos: getPos(tableParent)
+    };
+    entry.startTime = minToTime(entry.start, true), 
+    entry.durationTime = minToTime(entry.duration);
+    entry.dateNdx = this.findEntryDate(entry);
+    this.entries.push(entry);
   },
   logEntries: function() {
     this.entries.forEach(function(item) {
-      console.log('start:', minToTime(item.start, true), ', duration:', item.duration, 'x', item.tablePos);
+      console.log(item);
     });
   }
 };
