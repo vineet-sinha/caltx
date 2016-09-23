@@ -144,6 +144,11 @@ var calModel = {
           curBeg = item.start + item.duration;
         }
       });
+      if (curBeg < freeEnd) {
+        outCal.free[day].push(minToTime(curBeg) + '-' + minToTime(freeEnd));        
+      } else {
+        outCal.free[day].push('check: ' + minToTime(curBeg) + ' larger than or equal to ' + minToTime(freeEnd));        
+      }
     });
     console.log(outCal.free);
   }
