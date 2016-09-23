@@ -49,9 +49,14 @@ function timeInMin(hr, min) {
 function minToTime(totalMin, dontShowAMPM) {
   var hr = Math.trunc(totalMin / 60);
   var ampm = ' am';
-  if (!dontShowAMPM && hr > 12) {
-    ampm = ' pm';
-    hr -= 12;
+  if (!dontShowAMPM) {
+    if (hr == 12) {
+      ampm = ' pm';
+    }
+    if (hr > 12) {
+      ampm = ' pm';
+      hr -= 12;
+    }
   }
   var min = totalMin % 60;
   if (min == 0) min = '00'
