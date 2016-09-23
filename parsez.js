@@ -114,10 +114,12 @@ var calModel = {
   },
   logEntries: function() {
     var outCal = {
+      free: {},
       busy: {},
       entries: {}
     };
     this.days.forEach(function(day) {
+      outCal.free[day] = [];
       outCal.busy[day] = [];
       outCal.entries[day] = [];
     });
@@ -129,7 +131,21 @@ var calModel = {
     });
     console.log('Busy times');
     console.log(outCal.busy);
-    // console.log('Free times'); // TODO
+    console.log('Free times');
+    var freeBeg = timeInMin(     8, 0);
+    var freeEnd = timeInMin(12 + 6, 0);
+    this.days.forEach(function(day) {
+      // outCal.busy[day] = [];
+      // outCal.entries[day] = [];
+      var curBeg = freeBeg;
+      outCal.entries[day].forEach(function(item) {
+        if (curBeg < item.start) {
+          outCal.free[day].push(minToTime(curBeg) + '-' + item.startTime);
+          curBeg = item.start + item.duration;
+        }
+      });
+    });
+    console.log(outCal.free);
   }
 };
 
