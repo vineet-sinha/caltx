@@ -152,8 +152,8 @@ var calModel = {
     });
     console.log('Busy times');
     console.log(outCal.busy);
-    console.log('Free times');
-    console.log(outCal.free);
+    // console.log('Free times');
+    // console.log(outCal.free);
   }
 };
 
