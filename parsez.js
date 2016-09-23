@@ -134,14 +134,9 @@ var calModel = {
       outCal.busy[item.date].push(item.startTime + '-' + minToTime(item.start+item.duration));
       outCal.entries[item.date].push(item);
     });
-    console.log('Busy times');
-    console.log(outCal.busy);
-    console.log('Free times');
     var freeBeg = timeInMin(     8, 0);
     var freeEnd = timeInMin(12 + 6, 0);
     this.days.forEach(function(day) {
-      // outCal.busy[day] = [];
-      // outCal.entries[day] = [];
       var curBeg = freeBeg;
       outCal.entries[day].forEach(function(item) {
         if (curBeg < item.start) {
@@ -155,6 +150,9 @@ var calModel = {
         outCal.free[day].push('check: ' + minToTime(curBeg) + ' larger than or equal to ' + minToTime(freeEnd));        
       }
     });
+    console.log('Busy times');
+    console.log(outCal.busy);
+    console.log('Free times');
     console.log(outCal.free);
   }
 };
