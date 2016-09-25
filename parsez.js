@@ -62,7 +62,7 @@ function minToTime(totalMin, dontShowAMPM) {
   if (min == 0) min = '00'
   return '' + hr + ':' + min + (dontShowAMPM?'':ampm);
 }
-function findObstacles(days, entriesByDay, entries, entry) {
+function findObstacles(days, entriesByDay, entry) {
 
   // var debug = false;
   // if (entry.startTime == '10:45 am') {
@@ -110,7 +110,7 @@ var calModel = {
     var pos = entry.tablePos;
 
     // html table cells skip columns where there are obstables
-    pos += findObstacles(this.days, this.entriesByDay, this.entries, entry);
+    pos += findObstacles(this.days, this.entriesByDay, entry);
 
     entry.dayNdx = pos;
     return this.days[entry.dayNdx];
@@ -164,8 +164,6 @@ var calModel = {
       });
       if (curBeg < freeEnd) {
         outCal.free[day].push(minToTime(curBeg) + '-' + minToTime(freeEnd));        
-      } else {
-        outCal.free[day].push('check: ' + minToTime(curBeg) + ' larger than or equal to ' + minToTime(freeEnd));        
       }
     });
     console.log('Busy times');
