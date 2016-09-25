@@ -62,14 +62,29 @@ function minToTime(totalMin, dontShowAMPM) {
   if (min == 0) min = '00'
   return '' + hr + ':' + min + (dontShowAMPM?'':ampm);
 }
-function findObstacles(entries, entry) {
+function findObstacles(days, entriesByDay, entries, entry) {
+
+  // var debug = false;
+  // if (entry.startTime == '10:45 am') {
+  //   console.log('--- tgt entry: ', entry);
+  //   debug = true;
+  // }
+
   var obstableCnt = 0;
-  entries.forEach(function(currEntry) {
-    if (entry.tablePos<currEntry.dayNdx) return; // we don't care about obstacles in the futre
-    // by default assume that there are no obstacles for the the given entry that we are searching, i.e. use tablePos (instead of dayNdx which is only avaialble after obstacle searching)
-    if (entry.start > currEntry.start && entry.start < (currEntry.start + currEntry.duration)) {
-      obstableCnt ++;
-    }
+  days.forEach(function(day, dayNdx) {
+    if (dayNdx>(entry.tablePos+obstableCnt)) return;
+    entriesByDay[dayNdx].forEach(function(currEntry) {
+      // by default assume that there are no obstacles for the the given entry that we are searching, i.e. use tablePos (instead of dayNdx which is only avaialble after obstacle searching)
+      if (entry.start > currEntry.start && entry.start < (currEntry.start + currEntry.duration)) {
+        // if (debug) {
+        //   console.log('found obstacle for tgt -- for:' + entry.startTime + ' with: ' + currEntry.startTime + '-' + minToTime(currEntry.start + currEntry.duration));
+        //   console.log('entry: ', entry);
+        //   console.log('obstacle: ', currEntry);
+        // }
+        obstableCnt ++;
+      }
+    });
+
   });
   return obstableCnt;
 }
@@ -78,6 +93,9 @@ function findObstacles(entries, entry) {
 // the actual model
 var calModel = {
   days: [],
+  entries: [],
+  entriesByDay: [],
+
   logDays: function() {
     this.days.forEach(function(item, ndx) {
       console.log(ndx + ': ' + item);
@@ -85,16 +103,14 @@ var calModel = {
   },
   addDay: function(dayOfWeekNdx, dayOfWeekStr) {
     calModel.days[dayOfWeekNdx] = strip(dayOfWeekStr);
+    calModel.entriesByDay[dayOfWeekNdx] = [];
   },
-
-
-  entries: [],
 
   findEntryDate: function(entry) {
     var pos = entry.tablePos;
 
     // html table cells skip columns where there are obstables
-    pos += findObstacles(this.entries, entry);
+    pos += findObstacles(this.days, this.entriesByDay, this.entries, entry);
 
     entry.dayNdx = pos;
     return this.days[entry.dayNdx];
@@ -114,6 +130,7 @@ var calModel = {
     entry.startTime = minToTime(entry.start);
     entry.durationTime = minToTime(entry.duration, true);
     entry.date = this.findEntryDate(entry);
+    this.entriesByDay[entry.dayNdx].push(entry);
     this.entries.push(entry);
 
     // console.log(entry);
