@@ -65,9 +65,9 @@ function minToTime(totalMin, dontShowAMPM) {
 function findObstacles(entries, entry) {
   var obstableCnt = 0;
   entries.forEach(function(currEntry) {
-    if (entry.tablePos<currEntry.tablePos) return; // we don't care about obstacles in the futre
+    if (entry.tablePos<currEntry.dayNdx) return; // we don't care about obstacles in the futre
+    // by default assume that there are no obstacles for the the given entry that we are searching, i.e. use tablePos (instead of dayNdx which is only avaialble after obstacle searching)
     if (entry.start > currEntry.start && entry.start < (currEntry.start + currEntry.duration)) {
-      // console.log('found obstacle -- for:' + entry.startTime + ' with: ' + currEntry.startTime);
       obstableCnt ++;
     }
   });
@@ -96,7 +96,8 @@ var calModel = {
     // html table cells skip columns where there are obstables
     pos += findObstacles(this.entries, entry);
 
-    return this.days[pos];
+    entry.dayNdx = pos;
+    return this.days[entry.dayNdx];
   },
   addEntry: function(highlightCell, tableParent) {
     var start = tzCorr();
