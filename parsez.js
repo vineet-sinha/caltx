@@ -137,39 +137,39 @@ var calModel = {
   },
   logEntries: function() {
     var outCal = {
-      free: {},
-      busy: {},
-      entries: {}
+      freeByDay: {},
+      busyByDay: {},
+      entriesByDay: {}
     };
     this.days.forEach(function(day) {
-      outCal.free[day] = [];
-      outCal.busy[day] = [];
-      outCal.entries[day] = [];
+      outCal.freeByDay[day] = [];
+      outCal.busyByDay[day] = [];
+      outCal.entriesByDay[day] = [];
     });
     this.entries.forEach(function(item) {
       // console.log(item);
       // console.log(item.dateNdx + ': ' + item.startTime + '-' + minToTime(item.start+item.duration));
-      outCal.busy[item.date].push(item.startTime + '-' + minToTime(item.start+item.duration));
-      outCal.entries[item.date].push(item);
+      outCal.busyByDay[item.date].push(item.startTime + '-' + minToTime(item.start+item.duration));
+      outCal.entriesByDay[item.date].push(item);
     });
     var freeBeg = timeInMin(     8, 0);
     var freeEnd = timeInMin(12 + 6, 0);
     this.days.forEach(function(day) {
       var curBeg = freeBeg;
-      outCal.entries[day].forEach(function(item) {
+      outCal.entriesByDay[day].forEach(function(item) {
         if (curBeg < item.start) {
-          outCal.free[day].push(minToTime(curBeg) + '-' + item.startTime);
+          outCal.freeByDay[day].push(minToTime(curBeg) + '-' + item.startTime);
           curBeg = item.start + item.duration;
         }
       });
       if (curBeg < freeEnd) {
-        outCal.free[day].push(minToTime(curBeg) + '-' + minToTime(freeEnd));        
+        outCal.freeByDay[day].push(minToTime(curBeg) + '-' + minToTime(freeEnd));
       }
     });
     console.log('Busy times');
-    console.log(outCal.busy);
+    console.log(outCal.busyByDay);
     console.log('Free times');
-    console.log(outCal.free);
+    console.log(outCal.freeByDay);
   }
 };
 
